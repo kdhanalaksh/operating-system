@@ -1,0 +1,133 @@
+#include<stdio.h>
+#include<stdlib.h>
+
+void scan(int arr[], int head, int size, int direction) {
+    int distance = 0;
+    int cur_track;
+    int left = 0, right = 0;
+    int seek_sequence[size + 1];
+    
+    // Create an array to keep track of visited tracks
+    int visited[size];
+    for (int i = 0; i < size; i++)
+        visited[i] = 0;
+
+    // Initialize seek sequence
+    for (int i = 0; i < size + 1; i++)
+        seek_sequence[i] = 0;
+
+    // Separate the tracks into left and right based on the initial head position
+    for (int i = 0; i < size; i++) {
+        if (arr[i] < head)
+            left++;
+        if (arr[i] > head)
+            right++;
+    }
+
+    // Sort the left and right sequences
+    for (int i = 0; i < left - 1; i++) {
+        for (int j = 0; j < left - i - 1; j++) {
+            if (arr[j] < arr[j + 1]) {
+                // Swap the tracks
+                int temp = arr[j];
+                arr[j] = arr[j + 1];
+                arr[j + 1] = temp;
+            }
+        }
+    }
+
+    for (int i = left; i < size - 1; i++) {
+        for (int j = left; j < size - i - 1; j++) {
+            if (arr[j] > arr[j + 1]) {
+                // Swap the tracks
+                int temp = arr[j];
+                arr[j] = arr[j + 1];
+                arr[j + 1] = temp;
+            }
+        }
+    }
+
+    // Traverse the sorted tracks based on the direction
+    for (int i = 0; i < size; i++) {
+        cur_track = arr[i];
+        
+        // Calculate the distance and update the head position
+        distance = abs(cur_track - head);
+        head = cur_track;
+
+        // Mark the track as visited
+        visited[i] = 1;
+
+        // Update the seek sequence
+        seek_sequence[i] = cur_track;
+    }
+
+    // Reverse the direction and process the remaining tracks
+    if (direction == 1) {
+        for (int i = size - 1; i >= 0; i--) {
+            if (visited[i] == 0) {
+                cur_track = arr[i];
+                
+                // Calculate the distance and update the head position
+                distance = abs(cur_track - head);
+                head = cur_track;
+
+                // Update the seek sequence
+                seek_sequence[left + right] = cur_track;
+                left++;
+            }
+        }
+    } else {
+        for (int i = 0; i < size; i++) {
+            if (visited[i] == 0) {
+                cur_track = arr[i];
+                
+                // Calculate the distance and update the head position
+                distance = abs(cur_track - head);
+                head = cur_track;
+
+                // Update the seek sequence
+                seek_sequence[left + right] = cur_track;
+                right++;
+            }
+        }
+    }
+
+    // Display the seek sequence
+    printf("Seek Sequence is: \n");
+
+    for (int i = 0; i < size + 1; i++) {
+        printf("%d ", seek_sequence[i]);
+
+        if (i < size)
+            printf(" -> ");
+    }
+
+    printf("\n");
+
+    // Display the total distance
+    printf("Total Seek Distance is %d\n", distance);
+}
+
+int main() {
+    int size, head, direction;
+
+    printf("Enter the size of the disk queue: ");
+    scanf("%d", &size);
+
+    int arr[size];
+
+    printf("Enter the disk queue elements: ");
+    for (int i = 0; i < size; i++)
+        scanf("%d", &arr[i]);
+
+    printf("Enter the initial head position: ");
+    scanf("%d", &head);
+
+    printf("Enter the direction (0 for left, 1 for right): ");
+    scanf("%d", &direction);
+
+    scan(arr, head, size, direction);
+
+    return 0;
+}
